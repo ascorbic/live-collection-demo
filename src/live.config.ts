@@ -1,15 +1,18 @@
-import { defineCollection } from 'astro/config';
-import { createProductLoader, createCollectionLoader } from './loaders/shopify/index.js';
+import { defineCollection } from "astro:content";
+import {
+  createProductLoader,
+  createCollectionLoader,
+} from "./loaders/shopify/index.js";
 
-const MOCK_SHOP_API_URL = 'https://mock.shop/api';
+const MOCK_SHOP_API_URL = "https://mock.shop/api";
 
 const products = defineCollection({
-  type: 'live',
+  type: "live",
   loader: createProductLoader({ apiUrl: MOCK_SHOP_API_URL }),
 });
 
 const shopifyCollections = defineCollection({
-  type: 'live',
+  type: "live",
   loader: createCollectionLoader({ apiUrl: MOCK_SHOP_API_URL }),
 });
 

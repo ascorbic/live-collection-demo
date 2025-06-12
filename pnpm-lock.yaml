@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@astrojs/netlify':
         specifier: https://pkg.pr.new/@astrojs/netlify@13685
-        version: https://pkg.pr.new/@astrojs/netlify@13685(@types/node@24.0.1)(astro@https://pkg.pr.new/astro@13685(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3))(rollup@4.43.0)
+        version: https://pkg.pr.new/@astrojs/netlify@13685(@types/node@24.0.1)(astro@https://pkg.pr.new/astro@dc34de1(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3))(rollup@4.43.0)
       astro:
-        specifier: https://pkg.pr.new/astro@13685
-        version: https://pkg.pr.new/astro@13685(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3)
+        specifier: https://pkg.pr.new/astro@dc34de1
+        version: https://pkg.pr.new/astro@dc34de1(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3)
 
 packages:
 
@@ -722,8 +722,8 @@ packages:
     resolution: {integrity: sha512-WHw67kLXYbZuHTmcdbIrVArCq5wxo6NEuj3hiYAWr8mwJeC+C2mMCIBIWCiDoCye/OF/xelc+teJ1ERoWmnEIA==}
     engines: {node: '>=18'}
 
-  astro@https://pkg.pr.new/astro@13685:
-    resolution: {tarball: https://pkg.pr.new/astro@13685}
+  astro@https://pkg.pr.new/astro@dc34de1:
+    resolution: {tarball: https://pkg.pr.new/astro@dc34de1}
     version: 5.9.2
     engines: {node: 18.20.8 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
@@ -2603,14 +2603,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/netlify@https://pkg.pr.new/@astrojs/netlify@13685(@types/node@24.0.1)(astro@https://pkg.pr.new/astro@13685(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3))(rollup@4.43.0)':
+  '@astrojs/netlify@https://pkg.pr.new/@astrojs/netlify@13685(@types/node@24.0.1)(astro@https://pkg.pr.new/astro@dc34de1(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3))(rollup@4.43.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.6.1
       '@astrojs/underscore-redirects': 0.6.1
       '@netlify/blobs': 8.2.0
       '@netlify/functions': 3.1.10(rollup@4.43.0)
       '@vercel/nft': 0.29.4(rollup@4.43.0)
-      astro: https://pkg.pr.new/astro@13685(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3)
+      astro: https://pkg.pr.new/astro@dc34de1(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3)
       esbuild: 0.25.5
       tinyglobby: 0.2.14
       vite: 6.3.5(@types/node@24.0.1)
@@ -3304,7 +3304,7 @@ snapshots:
 
   ast-module-types@6.0.1: {}
 
-  astro@https://pkg.pr.new/astro@13685(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3):
+  astro@https://pkg.pr.new/astro@dc34de1(@netlify/blobs@8.2.0)(@types/node@24.0.1)(rollup@4.43.0)(typescript@5.8.3):
     dependencies:
       '@astrojs/compiler': 2.12.2
       '@astrojs/internal-helpers': 0.6.1

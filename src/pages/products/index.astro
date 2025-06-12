@@ -1,6 +1,6 @@
 ---
-import { getLiveCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import { getLiveCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
 
 export const prerender = false;
 
@@ -11,108 +11,141 @@ const filter: any = {
   first: 20,
 };
 
-if (searchParams.get('query')) {
-  filter.query = searchParams.get('query');
+if (searchParams.get("query")) {
+  filter.query = searchParams.get("query");
 }
 
-if (searchParams.get('available')) {
-  filter.available = searchParams.get('available') === 'true';
+if (searchParams.get("available")) {
+  filter.available = searchParams.get("available") === "true";
 }
 
-if (searchParams.get('sortKey')) {
-  filter.sortKey = searchParams.get('sortKey');
+if (searchParams.get("sortKey")) {
+  filter.sortKey = searchParams.get("sortKey");
 }
 
-if (searchParams.get('reverse')) {
-  filter.reverse = searchParams.get('reverse') === 'true';
+if (searchParams.get("reverse")) {
+  filter.reverse = searchParams.get("reverse") === "true";
 }
 
-const { entries: products, error } = await getLiveCollection('products', filter);
+const { entries: products, error } = await getLiveCollection(
+  "products",
+  filter
+);
 ---
 
 <Layout title="Products - Shopify Live Collections Demo">
   <main>
     <h1>Products</h1>
-    
+
     <div class="filters">
       <form method="get">
         <div class="filter-group">
           <label for="query">Search:</label>
-          <input 
-            type="text" 
-            id="query" 
-            name="query" 
-            value={searchParams.get('query') || ''} 
+          <input
+            type="text"
+            id="query"
+            name="query"
+            value={searchParams.get("query") || ""}
             placeholder="Search products..."
           />
         </div>
-        
+
         <div class="filter-group">
           <label for="available">Availability:</label>
           <select id="available" name="available">
             <option value="">All Products</option>
-            <option value="true" selected={searchParams.get('available') === 'true'}>In Stock</option>
-            <option value="false" selected={searchParams.get('available') === 'false'}>Out of Stock</option>
+            <option
+              value="true"
+              selected={searchParams.get("available") === "true"}
+              >In Stock</option
+            >
+            <option
+              value="false"
+              selected={searchParams.get("available") === "false"}
+              >Out of Stock</option
+            >
           </select>
         </div>
-        
+
         <div class="filter-group">
           <label for="sortKey">Sort by:</label>
           <select id="sortKey" name="sortKey">
             <option value="">Default</option>
-            <option value="TITLE" selected={searchParams.get('sortKey') === 'TITLE'}>Title</option>
-            <option value="PRICE" selected={searchParams.get('sortKey') === 'PRICE'}>Price</option>
-            <option value="CREATED_AT" selected={searchParams.get('sortKey') === 'CREATED_AT'}>Date Created</option>
-            <option value="BEST_SELLING" selected={searchParams.get('sortKey') === 'BEST_SELLING'}>Best Selling</option>
+            <option
+              value="TITLE"
+              selected={searchParams.get("sortKey") === "TITLE"}>Title</option
+            >
+            <option
+              value="PRICE"
+              selected={searchParams.get("sortKey") === "PRICE"}>Price</option
+            >
+            <option
+              value="CREATED_AT"
+              selected={searchParams.get("sortKey") === "CREATED_AT"}
+              >Date Created</option
+            >
+            <option
+              value="BEST_SELLING"
+              selected={searchParams.get("sortKey") === "BEST_SELLING"}
+              >Best Selling</option
+            >
           </select>
         </div>
-        
+
         <div class="filter-group">
           <label>
-            <input 
-              type="checkbox" 
-              name="reverse" 
-              value="true" 
-              checked={searchParams.get('reverse') === 'true'}
+            <input
+              type="checkbox"
+              name="reverse"
+              value="true"
+              checked={searchParams.get("reverse") === "true"}
             />
             Reverse Order
           </label>
         </div>
-        
+
         <button type="submit">Apply Filters</button>
         <a href="/products" class="clear-filters">Clear All</a>
       </form>
     </div>
 
-    {error && (
-      <div class="error">
-        <h2>Error loading products:</h2>
-        <p>{error.message}</p>
-      </div>
-    )}
+    {
+      error && (
+        <div class="error">
+          <h2>Error loading products:</h2>
+          <p>{error.message}</p>
+        </div>
+      )
+    }
 
-    {products && products.length > 0 ? (
-      <div class="products-grid">
-        {products.map((product) => (
-          <a href={`/products/${product.data.handle}`} class="product-card">
-            {product.data.featuredImage && (
-              <img 
-                src={product.data.featuredImage.url} 
-                alt={product.data.featuredImage.altText || product.data.title} 
-              />
-            )}
-            <h3>{product.data.title}</h3>
-            <p class="price">${product.data.priceRange.minVariantPrice.amount}</p>
-            <p class="availability">{product.data.availableForSale ? 'In Stock' : 'Out of Stock'}</p>
-            {product.data.productType && (
-              <p class="product-type">{product.data.productType}</p>
-            )}
-          </a>
-        ))}
-      </div>
-    ) : (
-      <p>No products found matching your criteria.</p>
-    )}
+    {
+      products && products.length > 0 ? (
+        <div class="products-grid">
+          {products.map((product) => (
+            <a href={`/products/${product.data.handle}`} class="product-card">
+              {product.data.featuredImage && (
+                <img
+                  src={product.data.featuredImage.url}
+                  alt={product.data.featuredImage.altText || product.data.title}
+                />
+              )}
+              <h3>{product.data.title}</h3>
+              <p class="price">
+                ${product.data.priceRange.minVariantPrice.amount}
+              </p>
+              <p class="availability">
+                {product.data.availableForSale ? "In Stock" : "Out of Stock"}
+              </p>
+              {product.data.productType && (
+                <p class="product-type">{product.data.productType}</p>
+              )}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p>No products found matching your criteria.</p>
+      )
+    }
 
     <div class="back-link">
       <a href="/">← Back to Home</a>
@@ -123,17 +156,19 @@ const { entries: products, error } = await getLiveCollection('products', filter)
 <style>
   main {
     margin: auto;
-    padding: 1rem;
-    width: 800px;
+    padding: 2rem;
+    width: 1000px;
     max-width: calc(100% - 2rem);
-    color: white;
+    color: #e5e5e5;
   }
 
   .filters {
-    background: #1a1a1a;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 16px;
     margin: 2rem 0;
+    border: 1px solid #333;
   }
 
   .filters form {
@@ -269,9 +304,13 @@ const { entries: products, error } = await getLiveCollection('products', filter)
   }
 
   h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 1rem 0;
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 2rem 0;
     text-align: center;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 </style>

@@ -1,0 +1,300 @@
+---
+import { getLiveCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = false;
+
+const url = Astro.url;
+const searchParams = url.searchParams;
+
+const filter: any = {
+  first: 12,
+};
+
+if (searchParams.get('query')) {
+  filter.query = searchParams.get('query');
+}
+
+if (searchParams.get('sortKey')) {
+  filter.sortKey = searchParams.get('sortKey');
+}
+
+if (searchParams.get('reverse')) {
+  filter.reverse = searchParams.get('reverse') === 'true';
+}
+
+const { entries: collections, error } = await getLiveCollection('collections', filter);
+---
+
+<Layout title="Collections - Shopify Live Collections Demo">
+  <main>
+    <h1>Collections</h1>
+    
+    <div class="filters">
+      <form method="get">
+        <div class="filter-group">
+          <label for="query">Search:</label>
+          <input 
+            type="text" 
+            id="query" 
+            name="query" 
+            value={searchParams.get('query') || ''} 
+            placeholder="Search collections..."
+          />
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortKey">Sort by:</label>
+          <select id="sortKey" name="sortKey">
+            <option value="">Default</option>
+            <option value="TITLE" selected={searchParams.get('sortKey') === 'TITLE'}>Title</option>
+            <option value="ID" selected={searchParams.get('sortKey') === 'ID'}>ID</option>
+            <option value="UPDATED_AT" selected={searchParams.get('sortKey') === 'UPDATED_AT'}>Updated Date</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>
+            <input 
+              type="checkbox" 
+              name="reverse" 
+              value="true" 
+              checked={searchParams.get('reverse') === 'true'}
+            />
+            Reverse Order
+          </label>
+        </div>
+        
+        <button type="submit">Apply Filters</button>
+        <a href="/collections" class="clear-filters">Clear All</a>
+      </form>
+    </div>
+
+    {error && (
+      <div class="error">
+        <h2>Error loading collections:</h2>
+        <p>{error.message}</p>
+      </div>
+    )}
+
+    {collections && collections.length > 0 ? (
+      <div class="collections-grid">
+        {collections.map((collection) => (
+          <a href={`/collections/${collection.data.handle}`} class="collection-card">
+            {collection.data.image && (
+              <img 
+                src={collection.data.image.url} 
+                alt={collection.data.image.altText || collection.data.title} 
+              />
+            )}
+            <div class="collection-info">
+              <h3>{collection.data.title}</h3>
+              <p class="description">{collection.data.description}</p>
+              <p class="updated">Updated: {new Date(collection.data.updatedAt).toLocaleDateString()}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="no-results">No collections found matching your criteria.</p>
+    )}
+
+    <div class="back-link">
+      <a href="/">← Back to Home</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 2rem;
+    width: 1000px;
+    max-width: calc(100% - 2rem);
+    color: #e5e5e5;
+  }
+
+  .filters {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 16px;
+    margin: 2rem 0;
+    border: 1px solid #333;
+  }
+
+  .filters form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-group label {
+    font-weight: 600;
+    color: #f5f5f5;
+    font-size: 0.9rem;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.75rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e5e5e5;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+
+  .filter-group input:focus,
+  .filter-group select:focus {
+    outline: none;
+    border-color: #4ade80;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(74, 222, 128, 0.3);
+  }
+
+  .clear-filters {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e5e5;
+    text-decoration: none;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    border: 1px solid #444;
+  }
+
+  .clear-filters:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .error {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid #ff4444;
+    color: #ff6666;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin: 2rem 0;
+  }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+
+  .collection-card {
+    border: 1px solid #333;
+    border-radius: 16px;
+    text-decoration: none;
+    color: #e5e5e5;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+
+  .collection-card:hover {
+    transform: translateY(-8px);
+    border-color: #4ade80;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(74, 222, 128, 0.1);
+  }
+
+  .collection-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .collection-info {
+    padding: 1.5rem;
+  }
+
+  .collection-card h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #f5f5f5;
+  }
+
+  .description {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .updated {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #4ade80;
+    font-weight: 500;
+  }
+
+  .no-results {
+    text-align: center;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    margin: 4rem 0;
+  }
+
+  .back-link {
+    margin: 3rem 0;
+    text-align: center;
+  }
+
+  .back-link a {
+    color: #4ade80;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .back-link a:hover {
+    color: #22c55e;
+    text-decoration: underline;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 2rem 0;
+    text-align: center;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>

@@ -1,16 +1,28 @@
-# Astro Starter Kit: Basics
+# Astro Live Collections Demo
 
-```sh
-pnpm create astro@latest -- --template basics
-```
+A demonstration of Astro's experimental **live content collections** feature using a Shopify loader that fetches data from [mock.shop](https://mock.shop) at runtime.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## ✨ Features
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- **Live Data Fetching** - Products and collections loaded at request time, not build time
+- **Type-Safe Filtering** - Rich filtering capabilities with TypeScript support
+- **Error Handling** - Robust error handling with custom error types
+- **Cache Optimization** - Smart cache hints for performance
+- **Real-Time Updates** - No rebuilds needed when data changes
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+## 🏗️ Live Collections Architecture
+
+This demo showcases how to build live collection loaders:
+
+- **`src/loaders/shopify/`** - Modular loader architecture
+- **`src/live.config.ts`** - Live collections configuration
+- **`src/pages/`** - Runtime data fetching examples
+
+## 🚀 Key Demo Pages
+
+- **Homepage** (`/`) - Featured products and collections overview
+- **Products** (`/products`) - Filterable product listing with search, sorting, and availability filters
+- **Product Details** (`/products/[handle]`) - Individual product pages with variants
 
 ## 🚀 Project Structure
 

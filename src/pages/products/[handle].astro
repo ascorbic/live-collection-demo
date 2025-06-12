@@ -1,0 +1,321 @@
+---
+import { getLiveEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = false;
+
+const { handle } = Astro.params;
+
+if (!handle) {
+  return Astro.redirect('/products');
+}
+
+const { entry: product, error } = await getLiveEntry('products', handle);
+
+if (error) {
+  console.error('Product error:', error.message);
+  return Astro.redirect('/404');
+}
+
+if (!product) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={`${product.data.title} - Shopify Live Collections Demo`}>
+  <main>
+    <div class="product-container">
+      <div class="product-images">
+        {product.data.featuredImage && (
+          <img 
+            src={product.data.featuredImage.url} 
+            alt={product.data.featuredImage.altText || product.data.title}
+            class="featured-image"
+          />
+        )}
+        
+        {product.data.images.length > 1 && (
+          <div class="image-gallery">
+            {product.data.images.slice(0, 4).map((image) => (
+              <img 
+                src={image.url} 
+                alt={image.altText || product.data.title}
+                class="gallery-image"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div class="product-info">
+        <h1>{product.data.title}</h1>
+        
+        <div class="price-section">
+          <span class="price">${product.data.priceRange.minVariantPrice.amount}</span>
+          {product.data.compareAtPriceRange && (
+            <span class="compare-price">${product.data.compareAtPriceRange.minVariantPrice.amount}</span>
+          )}
+        </div>
+
+        <div class="availability">
+          <span class={`status ${product.data.availableForSale ? 'in-stock' : 'out-of-stock'}`}>
+            {product.data.availableForSale ? '✓ In Stock' : '✗ Out of Stock'}
+          </span>
+        </div>
+
+        <div class="meta-info">
+          {product.data.vendor && <p><strong>Vendor:</strong> {product.data.vendor}</p>}
+          {product.data.productType && <p><strong>Type:</strong> {product.data.productType}</p>}
+          {product.data.tags.length > 0 && (
+            <div class="tags">
+              <strong>Tags:</strong>
+              {product.data.tags.map((tag, index) => (
+                <span class="tag">{tag}{index < product.data.tags.length - 1 ? ', ' : ''}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div class="description">
+          <h3>Description</h3>
+          <p>{product.data.description}</p>
+        </div>
+
+        {product.data.variants.length > 1 && (
+          <div class="variants">
+            <h3>Variants</h3>
+            <div class="variants-grid">
+              {product.data.variants.map((variant) => (
+                <div class="variant-card">
+                  <h4>{variant.title}</h4>
+                  <p class="variant-price">${variant.price.amount}</p>
+                  {variant.compareAtPrice && (
+                    <p class="variant-compare-price">${variant.compareAtPrice.amount}</p>
+                  )}
+                  <p class="variant-availability">
+                    {variant.availableForSale ? 'Available' : 'Unavailable'}
+                  </p>
+                  {variant.selectedOptions.length > 0 && (
+                    <div class="variant-options">
+                      {variant.selectedOptions.map((option) => (
+                        <span class="option">{option.name}: {option.value}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div class="navigation">
+      <a href="/products">← Back to Products</a>
+      <a href="/">← Back to Home</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 1000px;
+    max-width: calc(100% - 2rem);
+    color: white;
+  }
+
+  .product-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .product-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .product-images {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .featured-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #333;
+  }
+
+  .image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #333;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .gallery-image:hover {
+    border-color: #666;
+  }
+
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .price-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4ade80;
+  }
+
+  .compare-price {
+    font-size: 1.5rem;
+    color: #888;
+    text-decoration: line-through;
+  }
+
+  .availability {
+    font-size: 1.1rem;
+  }
+
+  .status.in-stock {
+    color: #4ade80;
+  }
+
+  .status.out-of-stock {
+    color: #ff4444;
+  }
+
+  .meta-info p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+
+  .tags {
+    margin: 0.5rem 0;
+  }
+
+  .tag {
+    color: #4ade80;
+  }
+
+  .description {
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+  }
+
+  .description h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+  }
+
+  .description p {
+    line-height: 1.6;
+    color: #ccc;
+  }
+
+  .variants {
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+  }
+
+  .variants h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+  }
+
+  .variants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .variant-card {
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #1a1a1a;
+  }
+
+  .variant-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  .variant-price {
+    font-weight: bold;
+    color: #4ade80;
+    margin: 0.25rem 0;
+  }
+
+  .variant-compare-price {
+    color: #888;
+    text-decoration: line-through;
+    margin: 0.25rem 0;
+  }
+
+  .variant-availability {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    opacity: 0.8;
+  }
+
+  .variant-options {
+    margin-top: 0.5rem;
+  }
+
+  .option {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0;
+  }
+
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    margin: 3rem 0;
+    padding-top: 2rem;
+    border-top: 1px solid #333;
+  }
+
+  .navigation a {
+    color: #4ade80;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  .navigation a:hover {
+    text-decoration: underline;
+  }
+</style>

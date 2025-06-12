@@ -1,0 +1,277 @@
+---
+import { getLiveCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = false;
+
+const url = Astro.url;
+const searchParams = url.searchParams;
+
+const filter: any = {
+  first: 20,
+};
+
+if (searchParams.get('query')) {
+  filter.query = searchParams.get('query');
+}
+
+if (searchParams.get('available')) {
+  filter.available = searchParams.get('available') === 'true';
+}
+
+if (searchParams.get('sortKey')) {
+  filter.sortKey = searchParams.get('sortKey');
+}
+
+if (searchParams.get('reverse')) {
+  filter.reverse = searchParams.get('reverse') === 'true';
+}
+
+const { entries: products, error } = await getLiveCollection('products', filter);
+---
+
+<Layout title="Products - Shopify Live Collections Demo">
+  <main>
+    <h1>Products</h1>
+    
+    <div class="filters">
+      <form method="get">
+        <div class="filter-group">
+          <label for="query">Search:</label>
+          <input 
+            type="text" 
+            id="query" 
+            name="query" 
+            value={searchParams.get('query') || ''} 
+            placeholder="Search products..."
+          />
+        </div>
+        
+        <div class="filter-group">
+          <label for="available">Availability:</label>
+          <select id="available" name="available">
+            <option value="">All Products</option>
+            <option value="true" selected={searchParams.get('available') === 'true'}>In Stock</option>
+            <option value="false" selected={searchParams.get('available') === 'false'}>Out of Stock</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="sortKey">Sort by:</label>
+          <select id="sortKey" name="sortKey">
+            <option value="">Default</option>
+            <option value="TITLE" selected={searchParams.get('sortKey') === 'TITLE'}>Title</option>
+            <option value="PRICE" selected={searchParams.get('sortKey') === 'PRICE'}>Price</option>
+            <option value="CREATED_AT" selected={searchParams.get('sortKey') === 'CREATED_AT'}>Date Created</option>
+            <option value="BEST_SELLING" selected={searchParams.get('sortKey') === 'BEST_SELLING'}>Best Selling</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>
+            <input 
+              type="checkbox" 
+              name="reverse" 
+              value="true" 
+              checked={searchParams.get('reverse') === 'true'}
+            />
+            Reverse Order
+          </label>
+        </div>
+        
+        <button type="submit">Apply Filters</button>
+        <a href="/products" class="clear-filters">Clear All</a>
+      </form>
+    </div>
+
+    {error && (
+      <div class="error">
+        <h2>Error loading products:</h2>
+        <p>{error.message}</p>
+      </div>
+    )}
+
+    {products && products.length > 0 ? (
+      <div class="products-grid">
+        {products.map((product) => (
+          <a href={`/products/${product.data.handle}`} class="product-card">
+            {product.data.featuredImage && (
+              <img 
+                src={product.data.featuredImage.url} 
+                alt={product.data.featuredImage.altText || product.data.title} 
+              />
+            )}
+            <h3>{product.data.title}</h3>
+            <p class="price">${product.data.priceRange.minVariantPrice.amount}</p>
+            <p class="availability">{product.data.availableForSale ? 'In Stock' : 'Out of Stock'}</p>
+            {product.data.productType && (
+              <p class="product-type">{product.data.productType}</p>
+            )}
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p>No products found matching your criteria.</p>
+    )}
+
+    <div class="back-link">
+      <a href="/">← Back to Home</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    color: white;
+  }
+
+  .filters {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+  }
+
+  .filters form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-group label {
+    font-weight: bold;
+    color: #ccc;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background: #2a2a2a;
+    color: white;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    background: #4ade80;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #22c55e;
+  }
+
+  .clear-filters {
+    padding: 0.75rem 1.5rem;
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .clear-filters:hover {
+    background: #4b5563;
+  }
+
+  .error {
+    background: #ff4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+
+  .product-card {
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    border-color: #666;
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  .product-card h3 {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+  }
+
+  .price {
+    font-weight: bold;
+    color: #4ade80;
+    margin: 0.25rem 0;
+    font-size: 1.1rem;
+  }
+
+  .availability {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    opacity: 0.8;
+  }
+
+  .product-type {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0;
+  }
+
+  .back-link {
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  .back-link a {
+    color: #4ade80;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  .back-link a:hover {
+    text-decoration: underline;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 1rem 0;
+    text-align: center;
+  }
+</style>

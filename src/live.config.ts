@@ -1,4 +1,5 @@
 import { defineLiveCollection } from "astro:content";
+import { z } from "astro/zod";
 import {
   createProductLoader,
   createCollectionLoader,
@@ -16,6 +17,9 @@ const loader = createCollectionLoader({ apiUrl: MOCK_SHOP_API_URL });
 const shopifyCollections = defineLiveCollection({
   type: "live",
   loader,
+  schema: z.object({
+    noid: z.string(),
+  }),
 });
 
 export const collections = { products, collections: shopifyCollections };

@@ -4,9 +4,17 @@ import Layout from "../layouts/Layout.astro";
 
 export const prerender = false;
 
-const { entries: products, error } = await getLiveCollection("products", {
+const {
+  entries: products,
+  error,
+  cacheHint,
+} = await getLiveCollection("products", {
   first: 8,
 });
+
+Astro.response.headers.set("cache-tag", cacheHint.tags.join(","));
+Astro.response.headers.set("cdn-cache-control", `s-maxage=${cacheHint.maxAge}`);
+
 const { entries: collections, error: collectionsError } =
   await getLiveCollection("collections", { first: 4 });
 ---

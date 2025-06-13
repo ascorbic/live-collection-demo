@@ -1,78 +1,88 @@
 ---
-import { getLiveEntry } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import { getLiveEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { LiveCollectionError } from "astro/content/runtime";
 
 export const prerender = false;
 
 const { handle } = Astro.params;
 
 if (!handle) {
-  return Astro.redirect('/collections');
+  return Astro.redirect("/collections");
 }
 
-const { entry: collection, error } = await getLiveEntry('collections', handle);
+const { entry: collection, error } = await getLiveEntry("collections", handle);
 
-if (error) {
-  console.error('Collection error:', error.message);
-  return Astro.redirect('/404');
+if (LiveCollectionError.is(error)) {
+  throw error;
 }
 
 if (!collection) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 ---
 
-<Layout title={`${collection.data.title} - Collections - Shopify Live Collections Demo`}>
+<Layout
+  title={`${collection.data.title} - Collections - Shopify Live Collections Demo`}
+>
   <main>
     <div class="collection-header">
-      {collection.data.image && (
-        <div class="hero-image">
-          <img 
-            src={collection.data.image.url} 
-            alt={collection.data.image.altText || collection.data.title}
-          />
-        </div>
-      )}
-      
+      {
+        collection.data.image && (
+          <div class="hero-image">
+            <img
+              src={collection.data.image.url}
+              alt={collection.data.image.altText || collection.data.title}
+            />
+          </div>
+        )
+      }
+
       <div class="collection-info">
         <h1>{collection.data.title}</h1>
         <p class="description">{collection.data.description}</p>
-        <p class="meta">Updated: {new Date(collection.data.updatedAt).toLocaleDateString()}</p>
+        <p class="meta">
+          Updated: {new Date(collection.data.updatedAt).toLocaleDateString()}
+        </p>
       </div>
     </div>
 
-    {collection.data.products && collection.data.products.edges.length > 0 ? (
-      <section class="products-section">
-        <h2>Products in this Collection</h2>
-        <div class="products-grid">
-          {collection.data.products.edges.map(({ node: product }) => (
-            <a href={`/products/${product.handle}`} class="product-card">
-              {product.featuredImage && (
-                <img 
-                  src={product.featuredImage.url} 
-                  alt={product.featuredImage.altText || product.title}
-                />
-              )}
-              <div class="product-info">
-                <h3>{product.title}</h3>
-                <p class="price">${product.priceRange.minVariantPrice.amount}</p>
-                <p class="availability">
-                  {product.availableForSale ? '✓ In Stock' : '✗ Out of Stock'}
-                </p>
-                {product.productType && (
-                  <p class="product-type">{product.productType}</p>
+    {
+      collection.data.products && collection.data.products.edges.length > 0 ? (
+        <section class="products-section">
+          <h2>Products in this Collection</h2>
+          <div class="products-grid">
+            {collection.data.products.edges.map(({ node: product }) => (
+              <a href={`/products/${product.handle}`} class="product-card">
+                {product.featuredImage && (
+                  <img
+                    src={product.featuredImage.url}
+                    alt={product.featuredImage.altText || product.title}
+                  />
                 )}
-              </div>
-            </a>
-          ))}
+                <div class="product-info">
+                  <h3>{product.title}</h3>
+                  <p class="price">
+                    ${product.priceRange.minVariantPrice.amount}
+                  </p>
+                  <p class="availability">
+                    {product.availableForSale ? "✓ In Stock" : "✗ Out of Stock"}
+                  </p>
+                  {product.productType && (
+                    <p class="product-type">{product.productType}</p>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <div class="no-products">
+          <h2>No Products Available</h2>
+          <p>This collection doesn't have any products yet.</p>
         </div>
-      </section>
-    ) : (
-      <div class="no-products">
-        <h2>No Products Available</h2>
-        <p>This collection doesn't have any products yet.</p>
-      </div>
-    )}
+      )
+    }
 
     <div class="navigation">
       <a href="/collections">← Back to Collections</a>

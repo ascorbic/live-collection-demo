@@ -1,5 +1,10 @@
-import { executeGraphQL } from './client.js';
-import type { ShopifyProduct, ShopifyCollection, ProductCollectionFilter, CollectionCollectionFilter } from './types.js';
+import { executeGraphQL } from "./client.js";
+import type {
+  ShopifyProduct,
+  ShopifyCollection,
+  ProductCollectionFilter,
+  CollectionCollectionFilter,
+} from "./types.js";
 
 const PRODUCTS_QUERY = `
   query GetProducts($first: Int, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
@@ -9,6 +14,7 @@ const PRODUCTS_QUERY = `
           id
           title
           description
+          descriptionHtml
           handle
           tags
           availableForSale
@@ -96,6 +102,7 @@ const PRODUCT_QUERY = `
       id
       title
       description
+      descriptionHtml
       handle
       tags
       availableForSale
@@ -306,6 +313,7 @@ export function transformProduct(productData: any): ShopifyProduct {
     id: productData.id,
     title: productData.title,
     description: productData.description,
+    descriptionHtml: productData.descriptionHtml,
     handle: productData.handle,
     tags: productData.tags || [],
     availableForSale: productData.availableForSale,
@@ -356,23 +364,26 @@ export async function getShopifyProducts(
   if (filter?.reverse !== undefined) variables.reverse = filter.reverse;
 
   const data = await executeGraphQL(PRODUCTS_QUERY, variables, apiUrl);
-  let products = data.products?.edges?.map((edge: any) => transformProduct(edge.node)) || [];
+  let products =
+    data.products?.edges?.map((edge: any) => transformProduct(edge.node)) || [];
 
   // Apply client-side filters that GraphQL doesn't support
   if (filter?.available !== undefined) {
-    products = products.filter((product: ShopifyProduct) => 
-      product.availableForSale === filter.available
+    products = products.filter(
+      (product: ShopifyProduct) => product.availableForSale === filter.available
     );
   }
 
   if (filter?.productType) {
-    products = products.filter((product: ShopifyProduct) => 
-      product.productType?.toLowerCase().includes(filter.productType!.toLowerCase())
+    products = products.filter((product: ShopifyProduct) =>
+      product.productType
+        ?.toLowerCase()
+        .includes(filter.productType!.toLowerCase())
     );
   }
 
   if (filter?.vendor) {
-    products = products.filter((product: ShopifyProduct) => 
+    products = products.filter((product: ShopifyProduct) =>
       product.vendor?.toLowerCase().includes(filter.vendor!.toLowerCase())
     );
   }
@@ -387,7 +398,7 @@ export async function getShopifyProduct(
   const variables: any = {};
 
   if (identifier.id) {
-    if (identifier.id.startsWith('gid://')) {
+    if (identifier.id.startsWith("gid://")) {
       variables.id = identifier.id;
     } else {
       variables.handle = identifier.id;
@@ -395,7 +406,7 @@ export async function getShopifyProduct(
   } else if (identifier.handle) {
     variables.handle = identifier.handle;
   } else {
-    throw new Error('Either id or handle must be provided');
+    throw new Error("Either id or handle must be provided");
   }
 
   const data = await executeGraphQL(PRODUCT_QUERY, variables, apiUrl);
@@ -415,7 +426,11 @@ export async function getShopifyCollections(
   if (filter?.reverse !== undefined) variables.reverse = filter.reverse;
 
   const data = await executeGraphQL(COLLECTIONS_QUERY, variables, apiUrl);
-  return data.collections?.edges?.map((edge: any) => transformCollection(edge.node)) || [];
+  return (
+    data.collections?.edges?.map((edge: any) =>
+      transformCollection(edge.node)
+    ) || []
+  );
 }
 
 export async function getShopifyCollection(
@@ -427,7 +442,7 @@ export async function getShopifyCollection(
   };
 
   if (identifier.id) {
-    if (identifier.id.startsWith('gid://')) {
+    if (identifier.id.startsWith("gid://")) {
       variables.id = identifier.id;
     } else {
       variables.handle = identifier.id;
@@ -435,7 +450,7 @@ export async function getShopifyCollection(
   } else if (identifier.handle) {
     variables.handle = identifier.handle;
   } else {
-    throw new Error('Either id or handle must be provided');
+    throw new Error("Either id or handle must be provided");
   }
 
   const data = await executeGraphQL(COLLECTION_QUERY, variables, apiUrl);

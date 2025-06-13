@@ -29,6 +29,7 @@ export interface ShopifyProduct {
   id: string;
   title: string;
   description: string;
+  descriptionHtml: string;
   handle: string;
   tags: string[];
   availableForSale: boolean;
@@ -64,7 +65,14 @@ export interface ShopifyCollection {
   };
 }
 
-export type SortKey = 'TITLE' | 'PRICE' | 'CREATED_AT' | 'UPDATED_AT' | 'ID' | 'BEST_SELLING' | 'RELEVANCE';
+export type SortKey =
+  | "TITLE"
+  | "PRICE"
+  | "CREATED_AT"
+  | "UPDATED_AT"
+  | "ID"
+  | "BEST_SELLING"
+  | "RELEVANCE";
 
 export interface ProductCollectionFilter {
   /** Maximum number of products to return */
@@ -96,7 +104,7 @@ export interface CollectionCollectionFilter {
   /** Search query for collection titles */
   query?: string;
   /** Sort collections by specified key */
-  sortKey?: 'TITLE' | 'ID' | 'UPDATED_AT';
+  sortKey?: "TITLE" | "ID" | "UPDATED_AT";
   /** Reverse the sort order */
   reverse?: boolean;
 }
@@ -115,6 +123,6 @@ export class ShopifyLoaderError extends Error {
     public statusCode?: number
   ) {
     super(message);
-    this.name = 'ShopifyLoaderError';
+    this.name = "ShopifyLoaderError";
   }
 }

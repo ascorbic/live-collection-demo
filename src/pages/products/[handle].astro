@@ -1,112 +1,149 @@
 ---
-import { getLiveEntry } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import { getLiveEntry, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { LiveEntryNotFoundError } from "astro/content/runtime";
 
 export const prerender = false;
 
 const { handle } = Astro.params;
 
 if (!handle) {
-  return Astro.redirect('/products');
+  return Astro.redirect("/products");
 }
 
-const { entry: product, error } = await getLiveEntry('products', handle);
+const { entry: product, error } = await getLiveEntry("products", handle);
 
-if (error) {
-  console.error('Product error:', error.message);
-  return Astro.redirect('/404');
+if (LiveEntryNotFoundError.is(error)) {
+  return Astro.redirect("/notfoudn");
 }
 
 if (!product) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
+
+const { Content } = await render(product);
 ---
 
 <Layout title={`${product.data.title} - Shopify Live Collections Demo`}>
   <main>
     <div class="product-container">
       <div class="product-images">
-        {product.data.featuredImage && (
-          <img 
-            src={product.data.featuredImage.url} 
-            alt={product.data.featuredImage.altText || product.data.title}
-            class="featured-image"
-          />
-        )}
-        
-        {product.data.images.length > 1 && (
-          <div class="image-gallery">
-            {product.data.images.slice(0, 4).map((image) => (
-              <img 
-                src={image.url} 
-                alt={image.altText || product.data.title}
-                class="gallery-image"
-              />
-            ))}
-          </div>
-        )}
+        {
+          product.data.featuredImage && (
+            <img
+              src={product.data.featuredImage.url}
+              alt={product.data.featuredImage.altText || product.data.title}
+              class="featured-image"
+            />
+          )
+        }
+
+        {
+          product.data.images.length > 1 && (
+            <div class="image-gallery">
+              {product.data.images.slice(0, 4).map((image) => (
+                <img
+                  src={image.url}
+                  alt={image.altText || product.data.title}
+                  class="gallery-image"
+                />
+              ))}
+            </div>
+          )
+        }
       </div>
 
       <div class="product-info">
         <h1>{product.data.title}</h1>
-        
+
         <div class="price-section">
-          <span class="price">${product.data.priceRange.minVariantPrice.amount}</span>
-          {product.data.compareAtPriceRange && (
-            <span class="compare-price">${product.data.compareAtPriceRange.minVariantPrice.amount}</span>
-          )}
+          <span class="price"
+            >${product.data.priceRange.minVariantPrice.amount}</span
+          >
+          {
+            product.data.compareAtPriceRange && (
+              <span class="compare-price">
+                ${product.data.compareAtPriceRange.minVariantPrice.amount}
+              </span>
+            )
+          }
         </div>
 
         <div class="availability">
-          <span class={`status ${product.data.availableForSale ? 'in-stock' : 'out-of-stock'}`}>
-            {product.data.availableForSale ? '✓ In Stock' : '✗ Out of Stock'}
+          <span
+            class={`status ${product.data.availableForSale ? "in-stock" : "out-of-stock"}`}
+          >
+            {product.data.availableForSale ? "✓ In Stock" : "✗ Out of Stock"}
           </span>
         </div>
 
         <div class="meta-info">
-          {product.data.vendor && <p><strong>Vendor:</strong> {product.data.vendor}</p>}
-          {product.data.productType && <p><strong>Type:</strong> {product.data.productType}</p>}
-          {product.data.tags.length > 0 && (
-            <div class="tags">
-              <strong>Tags:</strong>
-              {product.data.tags.map((tag, index) => (
-                <span class="tag">{tag}{index < product.data.tags.length - 1 ? ', ' : ''}</span>
-              ))}
-            </div>
-          )}
+          {
+            product.data.vendor && (
+              <p>
+                <strong>Vendor:</strong> {product.data.vendor}
+              </p>
+            )
+          }
+          {
+            product.data.productType && (
+              <p>
+                <strong>Type:</strong> {product.data.productType}
+              </p>
+            )
+          }
+          {
+            product.data.tags.length > 0 && (
+              <div class="tags">
+                <strong>Tags:</strong>
+                {product.data.tags.map((tag, index) => (
+                  <span class="tag">
+                    {tag}
+                    {index < product.data.tags.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </div>
+            )
+          }
         </div>
 
         <div class="description">
           <h3>Description</h3>
-          <p>{product.data.description}</p>
+          <Content />
         </div>
 
-        {product.data.variants.length > 1 && (
-          <div class="variants">
-            <h3>Variants</h3>
-            <div class="variants-grid">
-              {product.data.variants.map((variant) => (
-                <div class="variant-card">
-                  <h4>{variant.title}</h4>
-                  <p class="variant-price">${variant.price.amount}</p>
-                  {variant.compareAtPrice && (
-                    <p class="variant-compare-price">${variant.compareAtPrice.amount}</p>
-                  )}
-                  <p class="variant-availability">
-                    {variant.availableForSale ? 'Available' : 'Unavailable'}
-                  </p>
-                  {variant.selectedOptions.length > 0 && (
-                    <div class="variant-options">
-                      {variant.selectedOptions.map((option) => (
-                        <span class="option">{option.name}: {option.value}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+        {
+          product.data.variants.length > 1 && (
+            <div class="variants">
+              <h3>Variants</h3>
+              <div class="variants-grid">
+                {product.data.variants.map((variant) => (
+                  <div class="variant-card">
+                    <h4>{variant.title}</h4>
+                    <p class="variant-price">${variant.price.amount}</p>
+                    {variant.compareAtPrice && (
+                      <p class="variant-compare-price">
+                        ${variant.compareAtPrice.amount}
+                      </p>
+                    )}
+                    <p class="variant-availability">
+                      {variant.availableForSale ? "Available" : "Unavailable"}
+                    </p>
+                    {variant.selectedOptions.length > 0 && (
+                      <div class="variant-options">
+                        {variant.selectedOptions.map((option) => (
+                          <span class="option">
+                            {option.name}: {option.value}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        }
       </div>
     </div>
 

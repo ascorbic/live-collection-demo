@@ -32,10 +32,10 @@ To enable the feature, add the `experimental.liveContentCollections` flag to you
 Then create a new `src/live.config.ts` file (alongside your `src/content.config.ts` if you have one) to define your live collections with a [live loader](#creating-a-live-loader) and optionally a [schema](#using-zod-schemas):
 
 ```ts title="src/live.config.ts"
-import { defineCollection } from "astro:content";
+import { defineLiveCollection } from "astro:content";
 import { storeLoader } from "@mystore/astro-loader";
 
-const products = defineCollection({
+const products = defineLiveCollection({
   type: "live",
   loader: storeLoader({
     apiKey: process.env.STORE_API_KEY,
@@ -98,11 +98,11 @@ See the [limitations of experimental live collections](#live-collection-limitati
 You can [create your own live loaders](#creating-a-live-loader) for your data source, or you can use community loaders distributed as npm packages. Here's how you could use example CMS and e-commerce loaders:
 
 ```ts title="src/live.config.ts"
-import { defineCollection } from "astro:content";
+import { defineLiveCollection } from "astro:content";
 import { cmsLoader } from "@example/cms-astro-loader";
 import { productLoader } from "@example/store-astro-loader";
 
-const articles = defineCollection({
+const articles = defineLiveCollection({
   type: "live",
   loader: cmsLoader({
     apiKey: process.env.CMS_API_KEY,
@@ -110,7 +110,7 @@ const articles = defineCollection({
   }),
 });
 
-const products = defineCollection({
+const products = defineLiveCollection({
   type: "live",
   loader: productLoader({
     apiKey: process.env.STORE_API_KEY,
@@ -474,10 +474,10 @@ if (error) {
 Just like with build-time collections, you can use [Zod schemas](/en/guides/content-collections/#defining-the-collection-schema) with live collections to validate and transform data at runtime. When you define a schema, it takes precedence over [the loader's types](#type-safe-data) when you query the collection:
 
 ```ts title="src/live.config.ts"
-import { z, defineCollection } from "astro:content";
+import { z, defineLiveCollection } from "astro:content";
 import { apiLoader } from "./loaders/api-loader";
 
-const products = defineCollection({
+const products = defineLiveCollection({
   type: "live",
   loader: apiLoader({ endpoint: process.env.API_URL }),
   schema: z
@@ -598,7 +598,7 @@ Live collections use a different API than current preloaded content collections.
 
 1. **Execution time**: Runs at request time instead of build time
 1. **Configuration file**: Use `src/live.config.ts` instead of `src/content.config.ts`
-1. **Collection type**: Set `type: "live"` in `defineCollection`
+1. **Collection type**: Set `type: "live"` in `defineLiveCollection`
 1. **Loader API**: Implement `loadCollection` and `loadEntry` methods instead of the `load` method
 1. **Data return**: Return data directly instead of storing in the data store
 1. **User-facing functions**: Use `getLiveCollection`/`getLiveEntry` instead of `getCollection`/`getEntry`

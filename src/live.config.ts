@@ -1,4 +1,4 @@
-import { defineCollection } from "astro:content";
+import { defineLiveCollection } from "astro:content";
 import {
   createProductLoader,
   createCollectionLoader,
@@ -6,14 +6,14 @@ import {
 
 const MOCK_SHOP_API_URL = "https://mock.shop/api";
 
-const products = defineCollection({
+const products = defineLiveCollection({
   type: "live",
   loader: createProductLoader({ apiUrl: MOCK_SHOP_API_URL }),
 });
 
 const loader = createCollectionLoader({ apiUrl: MOCK_SHOP_API_URL });
 
-const shopifyCollections = defineCollection({
+const shopifyCollections = defineLiveCollection({
   type: "live",
   loader,
 });

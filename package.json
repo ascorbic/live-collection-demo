@@ -9,8 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/netlify": "https://pkg.pr.new/@astrojs/netlify@13685",
-    "astro": "https://pkg.pr.new/astro@dc34de1"
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/netlify": "https://pkg.pr.new/@astrojs/netlify@c63db9f",
+    "astro": "https://pkg.pr.new/astro@c63db9f",
+    "typescript": "^5.8.3"
   },
   "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
 }

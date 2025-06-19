@@ -1,6 +1,6 @@
-import { ShopifyLoaderError } from './types.js';
+import { ShopifyLoaderError } from "./types.js";
 
-const MOCK_SHOP_API_URL = 'https://mock.shop/api';
+const MOCK_SHOP_API_URL = "https://mock.shop/api";
 
 export interface GraphQLResponse<T = any> {
   data?: T;
@@ -14,13 +14,15 @@ export interface GraphQLResponse<T = any> {
 export async function executeGraphQL<T = any>(
   query: string,
   variables?: Record<string, any>,
-  apiUrl: string = MOCK_SHOP_API_URL
+  apiUrl: string = MOCK_SHOP_API_URL,
+  token?: string
 ): Promise<T> {
   try {
     const response = await fetch(apiUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        ...(token ? { "X-Shopify-Storefront-Access-Token": token } : {}),
       },
       body: JSON.stringify({
         query,
@@ -31,7 +33,7 @@ export async function executeGraphQL<T = any>(
     if (!response.ok) {
       throw new ShopifyLoaderError(
         `HTTP error ${response.status}: ${response.statusText}`,
-        'HTTP_ERROR',
+        "HTTP_ERROR",
         response.status
       );
     }
@@ -39,17 +41,17 @@ export async function executeGraphQL<T = any>(
     const result: GraphQLResponse<T> = await response.json();
 
     if (result.errors && result.errors.length > 0) {
-      const errorMessage = result.errors.map(e => e.message).join(', ');
+      const errorMessage = result.errors.map((e) => e.message).join(", ");
       throw new ShopifyLoaderError(
         `GraphQL error: ${errorMessage}`,
-        'GRAPHQL_ERROR'
+        "GRAPHQL_ERROR"
       );
     }
 
     if (!result.data) {
       throw new ShopifyLoaderError(
-        'No data returned from GraphQL query',
-        'NO_DATA'
+        "No data returned from GraphQL query",
+        "NO_DATA"
       );
     }
 
@@ -58,17 +60,19 @@ export async function executeGraphQL<T = any>(
     if (error instanceof ShopifyLoaderError) {
       throw error;
     }
-    
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+
+    if (error instanceof TypeError && error.message.includes("fetch")) {
       throw new ShopifyLoaderError(
-        'Network error: Unable to connect to Shopify API',
-        'NETWORK_ERROR'
+        "Network error: Unable to connect to Shopify API",
+        "NETWORK_ERROR"
       );
     }
 
     throw new ShopifyLoaderError(
-      `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
-      'UNKNOWN_ERROR'
+      `Unexpected error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      "UNKNOWN_ERROR"
     );
   }
 }

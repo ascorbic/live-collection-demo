@@ -1,5 +1,4 @@
 import { defineLiveCollection } from "astro:content";
-import { z } from "astro/zod";
 import {
   createProductLoader,
   createCollectionLoader,

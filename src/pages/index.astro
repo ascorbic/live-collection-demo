@@ -12,6 +12,10 @@ const {
   first: 8,
 });
 
+if (error) {
+  console.error("Error loading products:", error);
+}
+
 Astro.response.headers.set("cache-tag", cacheHint.tags.join(","));
 Astro.response.headers.set("cdn-cache-control", `s-maxage=${cacheHint.maxAge}`);
 
